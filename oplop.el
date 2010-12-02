@@ -19,7 +19,7 @@
 (defun oplop:base64-encode-string-urlsafe (str)
   (let* ((encoded (base64-encode-string str 't))
          (safer (oplop:replace-char-in-string "+" "-" encoded))
-         (safest (oplop:replace-char-in-string "/" "_" safest)))
+         (safest (oplop:replace-char-in-string "/" "_" safer)))
     safest))
 
 
