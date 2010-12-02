@@ -25,9 +25,9 @@
          (digest (decode-hex-string (md5 plain-text)))
          (encoded (base64-encode-string digest))
          (first-8 (substring encoded 0 8))
-         (digits (oplop:subsequence-of-digits first-8)))
-    (if (not digits) (concat "1" first-8)
-      first-8)))
+         (digits (oplop:subsequence-of-digits first-8))
+         (account-password (if digits first-8 (concat "1" (substring first-8 0 7)))))
+    account-password))
 
 
 (defun oplop ()
