@@ -9,23 +9,39 @@
     nil))
 
 
+(defun oplop:replace-char-in-string (chr rep str)
+  (let ((replaced str))
+    (while (string-match (concat "\\(" (regexp-quote chr) "\\)") replaced)
+      (setq replaced (replace-match rep nil nil replaced)))
+    replaced))
+
+
+(defun oplop:base64-encode-string-urlsafe (str)
+  (let* ((encoded (base64-encode-string str 't))
+         (safer (oplop:replace-char-in-string "+" "-" encoded))
+         (safest (oplop:replace-char-in-string "/" "_" safest)))
+    safest))
+
+
 (defun oplop:account-password (nickname master-password)
   ;; The steps it takes to generate an account password is:
-  ;; Concatenate the master password with the nickname (in that
-  ;; order!). Generate the MD5 hash of the concatenated string.
-  ;; Convert the MD5 hash to URL-safe Base64. See if there are any
-  ;; digits in the first 8 characters. If no digits are found ...
-  ;; Search for the first uninterrupted substring of digits. If a
-  ;; substring of digits is found, prepend them to the Base64 string.
-  ;; If no substring is found, prepend a 1. Use the first 8 characters
-  ;; as the account password.
   (let* ((master-password (encode-coding-string master-password 'utf-8))
          (nickname (encode-coding-string nickname 'utf-8))
+         ;; Concatenate the master password with the nickname (in that
+         ;; order!).
          (plain-text (concat master-password nickname))
+         ;; Generate the MD5 hash of the concatenated string.
          (digest (decode-hex-string (md5 plain-text)))
-         (encoded (base64-encode-string digest))
+         ;; Convert the MD5 hash to URL-safe Base64.
+         (encoded (oplop:base64-encode-string-urlsafe digest))
+         ;; See if there are any digits in the first 8 characters.
          (first-8 (substring encoded 0 8))
          (digits (oplop:subsequence-of-digits first-8))
+         ;; If no digits are found ... Search for the first
+         ;; uninterrupted substring of digits. If a substring of
+         ;; digits is found, prepend them to the Base64 string. If no
+         ;; substring is found, prepend a 1. Use the first 8
+         ;; characters as the account password.
          (account-password (if digits first-8 (concat "1" (substring first-8 0 7)))))
     account-password))
 
