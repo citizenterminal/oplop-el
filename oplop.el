@@ -47,13 +47,15 @@
 
 
 (defun oplop ()
-  "Oplop is a password hashing algorithm. See http://code.google.com/p/oplop/"
+  "Oplop is a password hashing algorithm. See
+http://code.google.com/p/oplop/ for details. When invoked, this
+interactive function prompts the user for their nickname and
+master password, and then copies the account password to the
+emacs kill-ring."
   (interactive "")
   (let ((nickname (read-string "nickname: "))
-        (master-password (read-passwd "master-password: "))
-        )
-    (kill-new (oplop:account-password nickname master-password))
-  ))
+        (master-password (read-passwd "master password: ")))
+    (kill-new (oplop:account-password nickname master-password))))
 
 
 (provide 'oplop)
